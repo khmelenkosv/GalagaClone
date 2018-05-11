@@ -1,8 +1,8 @@
 //TODO 
 // Разобраться с Лисенером и обращению к переменным в них!!!!!
 // Перестроить всё в MVC
-
-
+// Размер холста равне размеру развёрнутого экрана браузера, сделать перерисовку при изменении!!!
+// При зажатии стрелок игрок должен сразу лететь а не стопориться после первого нажатия
 var startGalaga = function(){
     initGame();
 }
@@ -22,12 +22,7 @@ var globalMenuCanvas;
  * Main menu
  * =============================================================================================================================
  */
-function initMenu(canvas)
-{
-   
-}
-
-function renderMenu(canvas)
+function showMenu(canvas)
 {
     var ctx = canvas.getContext("2d");
     var logoImage = new Image(400,300);
@@ -65,7 +60,7 @@ function renderMenu(canvas)
 
     textImage.onload = function()
     {
-        var size =35;
+        var size = 35;
         var visibility = false;
         var RAF = requestAnimationFrame(drawStartText);
         setInterval(function(){
@@ -76,12 +71,9 @@ function renderMenu(canvas)
                 cancelAnimationFrame(RAF);
                 visibility = !visibility;
                 ctx.clearRect(0, canvas.height/2, canvas.width, canvas.height);
-            }
-            
+            } 
         },500);
     }
-
-
 }
 
 /**
@@ -91,17 +83,72 @@ function renderMenu(canvas)
  */
 function initGame(){
     var backgroundCanvas = createCanvas();
-    renderBackground(backgroundCanvas);
+    showBackground(backgroundCanvas);
     var menuCanvas = createCanvas();
+
+    //кастыль -> лежит в глобальных переменных
     GlobalMenuCanvas = menuCanvas;
-    renderMenu(menuCanvas);
+    showMenu(menuCanvas);
 
     //+ загрузить весь контент, показать на экране стартовое меню
 }
 
 function startGame(){
-    var
+    var gameCanvas = createCanvas();
+    showGame(gameCanvas);
+
 }
+
+function showGame(canvas){
+    var ctx = canvas.getContext("2d"),
+        gameSprites = new Image(),
+        spriteSize = 20,
+        renderedSpriteSize = 60,
+        spriteSW = 180,
+        spriteSH = 55,
+        playerStartW = canvas.width/2 - renderedSpriteSize/2,
+        playerStartH = canvas.height- renderedSpriteSize,
+
+    function Rocket(){
+        this.x;
+        this.y;
+    }
+    
+    gameSprites.src = "textures/sprites.png";
+
+    function renderPlayer()
+    {
+        
+        ctx.drawImage(gameSprites, spriteSW, spriteSH, spriteSize, spriteSize , playerStartW  , playerStartH , renderedSpriteSize, renderedSpriteSize);
+    }
+
+    gameSprites.onload = renderPlayer();
+    
+
+    document.addEventListener("keydown", (event) => {
+        const keyName = event.key;
+    console.log(keyName);
+    if(keyName === "ArrowLeft"){
+        if((playerStartW - 20) > (window.screen.availWidth - document.documentElement.clientWidth)){
+            ctx.clearRect(playerStartW,playerStartH,renderedSpriteSize, renderedSpriteSize);
+            playerStartW -= 20;
+            renderPlayer();
+        }
+        return;
+    }
+    if(keyName === "ArrowRight"){
+        if((playerStartW + 20 + renderedSpriteSize) < (window.screen.availWidth - document.documentElement.clientWidth / 2)){
+            ctx.clearRect(playerStartW,playerStartH,renderedSpriteSize, renderedSpriteSize);
+            playerStartW += 20;
+            renderPlayer();
+        }
+        return;
+    }
+    }, false);
+}
+
+
+
 
 function togglePause(){
     this.isPaused = !this.isPaused;
@@ -119,9 +166,9 @@ function createCanvas(){
     {
         var canvas = document.createElement("canvas");
         document.body.appendChild(canvas);
-        canvas.width = window.outerWidth /2;
-        canvas.height = window.outerHeight;
-        
+        canvas.width =  window.screen.availWidth - document.documentElement.clientWidth /2;
+        canvas.height = document.documentElement.clientHeight ;
+        // window.screen.availHeight - (window.screen.availHeight - document.documentElement.clientHeight
     }
     return canvas;
 }
@@ -147,7 +194,7 @@ function Star(x,y){
     this.y = y;
 }
 
-function renderBackground(canvas)
+function showBackground(canvas)
 {
     var ctx = canvas.getContext("2d");
     var starsCount = 250;
@@ -226,6 +273,7 @@ if(keyName === "Enter"){
         {
             requestAnimationFrame(animateStarsBlinking);
             deleteCanvas(GlobalMenuCanvas);
+            startGame();
         }
         isPaused = false;
     return;
@@ -241,6 +289,7 @@ if(keyName === "p" || keyName === "P" || keyName === "з" || keyName === "З"){
 }
 
 }, false);
+
 
 }
 
