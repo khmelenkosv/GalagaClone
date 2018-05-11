@@ -1,7 +1,10 @@
-//???
+//TODO 
+// Разобраться с Лисенером и обращению к переменным в них!!!!!
+// Перестроить всё в MVC
+
+
 var startGalaga = function(){
     initGame();
-    //in
 }
 
 
@@ -11,21 +14,74 @@ var startGalaga = function(){
  * =============================================================================================================================
  */
 var isPaused = true;
-
-
+var backgroundCanvas;
+var globalMenuCanvas;
 
 /**
  * =============================================================================================================================
  * Main menu
  * =============================================================================================================================
  */
-function initMenu(width, height){
-    var logoImage = new Image(700,600);
-        logoImage.src = "textures/Galaga_logo.png";
+function initMenu(canvas)
+{
+   
 }
 
-var renderMenu = function(){
+function renderMenu(canvas)
+{
+    var ctx = canvas.getContext("2d");
+    var logoImage = new Image(400,300);
+    var textImage = new Image();
+    var spritesImage = new Image();
+
+    logoImage.src = "textures/Galaga_logo.png";
+    textImage.src = "textures/font.jpg";
+    spritesImage.src = "textures/sprites.png"
     
+    
+    logoImage.onload = function()
+    {
+        ctx.drawImage(logoImage, canvas.width / 2 - logoImage.width/2 , 100, 400, 300);
+    }
+   
+    function drawStartText(){
+        var dw = 16;
+        var dh = 16;
+        var size = 35;
+        var sp = canvas.width/3 - size;
+
+        ctx.clearRect(sp,canvas.height/2, size * 10, size);
+        //                      координаты в картинке | ширина и высота вырезки|   коорд в холсте |       изменённые размеры
+        ctx.drawImage(textImage,  dw * 3, dh * 5,       dw-1, dh-1 ,     sp + size * 0 ,canvas.height/2,      size,size);
+        ctx.drawImage(textImage,  dw * 4, dh * 5,       dw-1, dh-1 ,     sp + size * 1 ,canvas.height/2,      size,size);
+        ctx.drawImage(textImage,  dw * 1, dh * 4,       dw-1, dh-1 ,     sp + size * 2 ,canvas.height/2,      size,size);
+        ctx.drawImage(textImage,  dw * 2, dh * 5,       dw-1, dh-1 ,     sp + size * 3 ,canvas.height/2,      size,size);
+        ctx.drawImage(textImage,  dw * 4, dh * 5,       dw-1, dh-1 ,     sp + size * 4 ,canvas.height/2,      size,size);
+        ctx.drawImage(textImage,  dw * 7, dh * 4,       dw-1, dh-1 ,     sp + size * 6 ,canvas.height/2,      size,size);
+        ctx.drawImage(textImage,  dw * 1, dh * 4,       dw-1, dh-1 ,     sp + size * 7 ,canvas.height/2,      size,size);
+        ctx.drawImage(textImage,  dw * 13, dh * 4,      dw-1, dh-1 ,     sp + size * 8 ,canvas.height/2,      size,size);
+        ctx.drawImage(textImage,  dw * 5, dh * 4,       dw-1, dh-1 ,     sp + size * 9 ,canvas.height/2,      size,size);
+    }
+
+    textImage.onload = function()
+    {
+        var size =35;
+        var visibility = false;
+        var RAF = requestAnimationFrame(drawStartText);
+        setInterval(function(){
+            if(visibility){
+                requestAnimationFrame(drawStartText);
+                visibility = !visibility;
+            } else{
+                cancelAnimationFrame(RAF);
+                visibility = !visibility;
+                ctx.clearRect(0, canvas.height/2, canvas.width, canvas.height);
+            }
+            
+        },500);
+    }
+
+
 }
 
 /**
@@ -37,7 +93,14 @@ function initGame(){
     var backgroundCanvas = createCanvas();
     renderBackground(backgroundCanvas);
     var menuCanvas = createCanvas();
-    initMenu();
+    GlobalMenuCanvas = menuCanvas;
+    renderMenu(menuCanvas);
+
+    //+ загрузить весь контент, показать на экране стартовое меню
+}
+
+function startGame(){
+    var
 }
 
 function togglePause(){
@@ -62,6 +125,9 @@ function createCanvas(){
     }
     return canvas;
 }
+function deleteCanvas(canvas){
+    document.body.removeChild(canvas);
+}
 
 
 /**
@@ -84,7 +150,7 @@ function Star(x,y){
 function renderBackground(canvas)
 {
     var ctx = canvas.getContext("2d");
-    var starsCount = 150;
+    var starsCount = 250;
     var additionalStarsCount = 50;
 
     function makeStarsArray(starsCount){
@@ -100,9 +166,10 @@ function renderBackground(canvas)
     var additionalStarsArray = makeStarsArray(additionalStarsCount);
    
 
-    function renderStarsStatic(starsArray,speed){
+    function renderStars(starsArray,speed){
+        ctx.beginPath();
         starsArray.forEach(element => {
-            ctx.beginPath();
+            
             ctx.fillStyle = element["color"] + element["opacity"] ;
             if(element['iSvisible']){
                 ctx.fillRect(element['x'],element["y"], element["size"], element["size"]);
@@ -121,8 +188,8 @@ function renderBackground(canvas)
 
     function animateStarsBlinking(){
             ctx.clearRect(0,0, canvas.width, canvas.height)
-            renderStarsStatic(starsArray, 5);
-            renderStarsStatic(additionalStarsArray, 5);
+            renderStars(starsArray, 5);
+            renderStars(additionalStarsArray, 5);
             if(isPaused)
             {
                 cancelAnimationFrame(RAF);
@@ -158,12 +225,13 @@ if(keyName === "Enter"){
     if(isPaused)
         {
             requestAnimationFrame(animateStarsBlinking);
+            deleteCanvas(GlobalMenuCanvas);
         }
         isPaused = false;
     return;
 }
 
-if(keyName === "p"){
+if(keyName === "p" || keyName === "P" || keyName === "з" || keyName === "З"){
     if(isPaused)
         {
             requestAnimationFrame(animateStarsBlinking);
