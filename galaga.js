@@ -1,4 +1,9 @@
-//TODO
+//???
+var startGalaga = function(){
+    initGame();
+    //in
+}
+
 
 /**
  * =============================================================================================================================
@@ -7,23 +12,6 @@
  */
 var isPaused = true;
 
-var initGame = function(){
-    var canvas = createCanvas();
-    renderBackground(canvas);
-}
-
-
-var startMenu = function(){
-
-}
-
-var background = function(){
-
-}
-
-var galaga = function(){
-    
-}
 
 
 /**
@@ -31,29 +19,39 @@ var galaga = function(){
  * Main menu
  * =============================================================================================================================
  */
-function initMenu(){
-    
+function initMenu(width, height){
+    var logoImage = new Image(700,600);
+        logoImage.src = "textures/Galaga_logo.png";
 }
 
-
+var renderMenu = function(){
+    
+}
 
 /**
  * =============================================================================================================================
  * Game functions
  * =============================================================================================================================
  */
+function initGame(){
+    var backgroundCanvas = createCanvas();
+    renderBackground(backgroundCanvas);
+    var menuCanvas = createCanvas();
+    initMenu();
+}
+
 function togglePause(){
     this.isPaused = !this.isPaused;
 }
 
 
 // нарисовать холст на всю высоту и на половину ширины в середине
-var checkCanvas = function(){
+ function checkCanvas(){
     var canvas = document.createElement("canvas");
     return  canvas.getContext || canvas.getContext("2d");
 }
 
-var createCanvas = function(){
+function createCanvas(){
     if(checkCanvas)
     {
         var canvas = document.createElement("canvas");
@@ -66,12 +64,11 @@ var createCanvas = function(){
 }
 
 
-
-
-
 /**
  * =============================================================================================================================
- * Background
+ * Background 
+ *              Create star object
+ *              Render background (space)
  * =============================================================================================================================
  */
 
@@ -147,16 +144,36 @@ function renderBackground(canvas)
         });
     }, 20);
 
+/**
+ * =============================================================================================================================
+ * Controlls
+ * =============================================================================================================================
+ */
 
-    // поставить в подходящее место 
-    canvas.onclick = function(){
-        if(isPaused)
+// сделать глобальным
+document.addEventListener("keydown", (event) => {
+    const keyName = event.key;
+
+if(keyName === "Enter"){
+    if(isPaused)
         {
             requestAnimationFrame(animateStarsBlinking);
         }
-        isPaused = !isPaused; 
-    }
- 
+        isPaused = false;
+    return;
+}
+
+if(keyName === "p"){
+    if(isPaused)
+        {
+            requestAnimationFrame(animateStarsBlinking);
+        }
+        isPaused = !isPaused;
+    return;
+}
+
+}, false);
+
 }
 
 
@@ -168,5 +185,7 @@ function renderBackground(canvas)
  * Start Game
  * =============================================================================================================================
  */
-initGame();
+startGalaga(); 
+
+
 
